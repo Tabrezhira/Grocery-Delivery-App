@@ -76,6 +76,30 @@ export const refreshToken  = async (req, reply) => {
     const {refreshToken} = req.body
 
     if(!refreshToken){
-        return reply.status(401.send({message:""}))
+        return reply.status(401).send({message:'Refresh token required'});
+    }
+
+    try {
+        const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+        let user;
+
+        if(decoded.role === 'Customer'){
+            user = await Customer.findById(decoded.userId);
+        }else if (decoded.role === 'DeliveryPartner'){
+            user = await DeliveryPartner.findById(decoded.userId)
+        }else{
+            return reply.status(403).send({message:'User Not Found'})
+        }
+
+        const {accessToken, refreshToken:newRefreshToken } = generateTokens(user);
+
+        return reply.send({
+            message:"Token Refreshed",
+            accessToken,
+            refreshToken:newRefreshToken
+        })
+
+    } catch (error) {
+        return reply.status(403).send({message:'Invalid Refresh Token'})
     }
 }
