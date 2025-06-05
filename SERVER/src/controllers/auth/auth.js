@@ -96,10 +96,36 @@ export const refreshToken  = async (req, reply) => {
         return reply.send({
             message:"Token Refreshed",
             accessToken,
-            refreshToken:newRefreshToken
+            refreshToken:newRefreshToken,
         })
 
     } catch (error) {
         return reply.status(403).send({message:'Invalid Refresh Token'})
+    }
+}
+
+export const fetchUser = async (req,reply) => {
+    try {
+        const {userId, role} = req.user;
+        let user;
+
+        if(role === 'Customer'){
+            user=await Customer.findById(userId);
+        }else if (role === 'DeliveryPartner'){
+            user = await DeliveryPartner.findById(userId);
+        }else{
+            return reply.status(403).send({message:'Invalid Role'})
+        }
+
+        if (!user){
+            return reply.status(404).send({message:'User not found'});
+        }
+
+        return reply.send({
+            message:'User fetched successfully',
+            user,
+        })
+    } catch (error) {
+        return reply.status(500).send({message:'An error occurred', error })
     }
 }
