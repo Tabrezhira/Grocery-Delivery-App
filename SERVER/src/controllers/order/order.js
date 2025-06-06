@@ -77,5 +77,59 @@ export const confirmOrder = async(req, reply) => {
 }
 
 export const updateOrderStatus = async(req, reply) => {
+    try {
+        const {orderId} = req.params;
+        const {status, deliveryPersonLocation} = req.body;
+        const {userId} = req.user;
 
+        const deliveryPerson = await DeliveryPartner.findById(userId);
+        if(!deliveryPerson){
+            return reply.status(404).send({message:'Delivery Person not found'});
+        }
+
+        const order = await Order.findById(orderId);
+        if(!order) return reply.status(404).send({message:'Order not found'})
+
+        if (['cancelled', 'delivered'].includes(order.status)){
+            return reply.status(400).send({message:'Order cannot be updated'})
+        }
+
+        if (order.deliveryPartner.toString() !== userId){
+            return reply.status(403).send({message:'Unauthorized'})
+        }
+
+        order.status = status;
+        order.deliveryPersonLocation = deliveryPersonLocation;
+        await order.save();
+
+        req.server.io.to(orderId).emit('liveTrackingUpdates', order)
+
+    } catch (error) {
+        return reply.status(500).send({message:'Failed to update order status', error})
+    }
+}
+
+export const getOrders = async (req, reply) => {
+    try {
+        const {status, customerId, deliveryPartnerId, branchId} = req.query;
+        let query = {};
+
+        if (status) {
+            query.status = status;
+        }
+        if(customerId) {
+            query.customer = customerId
+        }
+        if(deliveryPartnerId){
+            query.deliveryPartner = deliveryPartnerId
+        }
+
+        const orders = await Order.find(query).populate(
+            "customer branch items.item deliveryPartner"
+        )
+
+        return reply.send(orders)
+    } catch (error) {
+        return reply.status(500).send({message:'Failed to getOrders', error})
+    }
 }
