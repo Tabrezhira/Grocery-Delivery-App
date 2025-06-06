@@ -121,15 +121,35 @@ export const getOrders = async (req, reply) => {
             query.customer = customerId
         }
         if(deliveryPartnerId){
-            query.deliveryPartner = deliveryPartnerId
+            query.deliveryPartner = deliveryPartnerId;
+            query.branch = branchId
         }
 
         const orders = await Order.find(query).populate(
             "customer branch items.item deliveryPartner"
         )
-
+        if(!orders) {
+            return reply.status(404).send({message:'Order not Found'})
+        }
         return reply.send(orders)
     } catch (error) {
         return reply.status(500).send({message:'Failed to getOrders', error})
+    }
+}
+
+export const getOrderById = async (req, reply) => {
+    try {
+        const {orderId} = req.params;
+        const order = await Order.findById(orderId).populate(
+            "customer Branch items.item deliveryPartner"
+        )
+
+        if(!order){
+            return reply.status(404).send({message:'Order not found'});
+        }
+
+        return reply.send(order);
+    } catch (error) {
+        return reply.status(500).send({message:'Failed to retrieve order', error})
     }
 }
