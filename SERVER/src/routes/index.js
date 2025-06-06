@@ -1,6 +1,6 @@
-import { authRoutes } from "./auth";
-import { orderRoutes } from "./orders";
-import { categoryRoutes, productRoutes } from "./products";
+import { authRoutes } from "./auth.js";
+import { orderRoutes } from "./orders.js";
+import { categoryRoutes, productRoutes } from "./products.js";
 
 const prefix = '/api';
 

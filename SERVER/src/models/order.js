@@ -47,10 +47,10 @@ const orderSchema = new mongoose.Schema({
     },
     deliveryPersonLocation:{
         latitude:{type:Number},
-        longitude:{type:number},
+        longitude:{type:Number},
         address:{type:String},
     },
-    totalPrice:{type:number, required:true},
+    totalPrice:{type:Number, required:true},
     createdAt:{type:Date, default:Date.now},
     updatedAt:{type:Date, default:Date.now}
 });

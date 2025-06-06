@@ -1,4 +1,4 @@
-import {Order, Branch, Customer,DeliveryPartner} from'./../../models/index'
+import {Order, Branch, Customer,DeliveryPartner} from'./../../models/index.js'
 
 export const createOrder = async(req,reply) => {
     try {
