@@ -1,12 +1,16 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 export const PORT = process.env.PORT || 3000;
-export const COOKIE_PASSWORD = process.env.COOKIE_PASSWORD
+export const COOKIE_PASSWORD = process.env.COOKIE_PASSWORD;
+export const MONGO_URI = process.env.MONGO_URL || process.env.MONGO_URI;
 import ConnectMongoDBSession from 'connect-mongodb-session';
 import fastifySession from '@fastify/session';
 
 const MongoDbStore = ConnectMongoDBSession(fastifySession)
 
 export const sessionStore = new MongoDbStore({
-    uri:process.env.MONGO_URI,
+    uri:process.env.MONGO_URL,
     collection:'sessions'
 })
 
@@ -15,7 +19,7 @@ sessionStore.on('error',(error) =>{
 })
 
 export const authenticate = async(email,password)=>{
-    if(email & password){
+    if(email && password){
         if(email=='Tabrez.hira@gmail.com' && password=='Hamza.447'){
             return Promise.resolve({email: email, password:password})
         }else{
