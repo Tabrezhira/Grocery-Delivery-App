@@ -8,7 +8,9 @@ import { authenticate, COOKIE_PASSWORD, sessionStore } from './config.js'
 import { dark, light, noSidebar } from '@adminjs/themes'
 
 
-AdminJS.registerAdapter(MongooseAdapter)
+// AdminJS.registerAdapter(MongooseAdapter)
+AdminJS.registerAdapter(AdminJSMongoose);
+
 
 export const admin = new AdminJS({
     resources:[

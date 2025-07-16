@@ -1,11 +1,15 @@
-import 'dotenv/config'
+import dotenv from 'dotenv';
+dotenv.config();
+
 import { connectDb } from './src/config/connect.js'
 import fastify from 'fastify'
 import { PORT } from './src/config/config.js'
 import fastifySocketIO from 'fastify-socket.io'
 import { registerRoutes } from './src/routes/index.js'
+import{admin, buildAdminRouter} from './src/config/setup.js'
 
 const start = async()=>{
+
     await connectDb(process.env.MONGO_URL)
     const app = fastify()
 
@@ -20,11 +24,13 @@ const start = async()=>{
 
     await registerRoutes(app)
 
+    await buildAdminRouter(app)
+
     app.listen({port:PORT,host:'0.0.0.0'},(err,addr) => {
         if(err){
             console.log(err)
         }else{
-            console.log(`Grocery App is running on http://localhost:${PORT}`)
+            console.log(`Grocery App is running on http://localhost:${PORT}${admin.options.rootPath}`)
         }
     })
 
